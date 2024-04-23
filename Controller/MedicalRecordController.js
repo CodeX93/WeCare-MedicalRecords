@@ -269,30 +269,29 @@ const updatedVisibility = async (req, res) => {
         .json({ error: "PatientId or recordId not provided" });
     }
 
-    // Query Firestore to find the document with recordId field equal to the specified recordId value
-
-    const medicalRecordQuery = query(
-      collection(db, "PatientRecords", patientId, "medical_records"),
-      where("id", "==", recordId)
+    // Reference to the medical record document
+    const medicalRecordRef = doc(
+      db,
+      "PatientRecords",
+      patientId,
+      "medical_records",
+      recordId
     );
-    const medicalRecordSnapshot = await getDocs(medicalRecordQuery);
 
-    // Check if any document matches the query
-    if (medicalRecordSnapshot.empty) {
+    // Check if the medical record document exists
+    const medicalRecordSnapshot = await getDoc(medicalRecordRef);
+    if (!medicalRecordSnapshot.exists()) {
       return res.status(404).json({ error: "Medical record not found" });
     }
 
-    // Since recordId should be unique, there should be only one document in the snapshot
-    const medicalRecordDoc = medicalRecordSnapshot.docs[0];
-
     // Get the current value of isVisibleToDoctor
-    const currentVisibility = medicalRecordDoc.data().isVisibleToDoctor;
+    const currentVisibility = medicalRecordSnapshot.data().isVisibleToDoctor;
 
     // Toggle the isVisibleToDoctor flag
     const updatedVisibility = !currentVisibility;
 
     // Update the medical record document in Firestore
-    await updateDoc(medicalRecordDoc.ref, {
+    await updateDoc(medicalRecordRef, {
       isVisibleToDoctor: updatedVisibility,
     });
 
@@ -319,23 +318,23 @@ const deleteMedicalRecordById = async (req, res) => {
         .json({ error: "PatientId or recordId not provided" });
     }
 
-    // Query Firestore to find the document with recordId field equal to the specified recordId value
-    const medicalRecordQuery = query(
-      collection(db, "PatientRecords", patientId, "medical_records"),
-      where("id", "==", recordId)
+    // Reference to the medical record document
+    const medicalRecordRef = doc(
+      db,
+      "PatientRecords",
+      patientId,
+      "medical_records",
+      recordId
     );
-    const medicalRecordSnapshot = await getDocs(medicalRecordQuery);
 
-    // Check if any document matches the query
-    if (medicalRecordSnapshot.empty) {
+    // Check if the medical record document exists
+    const medicalRecordSnapshot = await getDoc(medicalRecordRef);
+    if (!medicalRecordSnapshot.exists()) {
       return res.status(404).json({ error: "Medical record not found" });
     }
 
-    // Since recordId should be unique, there should be only one document in the snapshot
-    const medicalRecordDoc = medicalRecordSnapshot.docs[0];
-
     // Delete the medical record document from Firestore
-    await deleteDoc(medicalRecordDoc.ref);
+    await deleteDoc(medicalRecordRef);
 
     // Return a success response
     res.status(200).json({
