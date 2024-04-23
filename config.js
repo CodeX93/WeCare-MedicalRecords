@@ -8,7 +8,8 @@ const firebaseConfig = JSON.parse(process.env.firebaseConfig);
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const MedicalRecord = collection(db, "MedicalRecords");
+const PatientRecords = collection(db, "PatientRecords");
+const Template = collection(db, "Templates");
 // const analytics = getAnalytics(app);
 
-export { app, db, MedicalRecord };
+export { app, db, PatientRecords, Template };
