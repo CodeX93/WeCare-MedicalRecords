@@ -159,6 +159,12 @@ const addRecordWithPrescription = async (req, res) => {
         medicalRecordData = {
           ...medicalRecordData,
           ...templateData,
+          comments: comments || templateData.comments,
+          recordTitle: recordTitle || templateData.recordTitle,
+          medications: medications.map((userMedication, index) => ({
+            ...templateData.medications[index],
+            ...userMedication,
+          })),
         };
       }
     }
